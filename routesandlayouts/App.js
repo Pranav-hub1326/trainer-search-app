@@ -1,80 +1,173 @@
 // App.js
-import React, { useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
+  TextInput,
+  TouchableOpacity,
   StyleSheet,
-  Image,
-  Animated,
   SafeAreaView,
+  ActivityIndicator,
+  Image
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 
 export default function App() {
-  // Built-in working placeholder image (always available)
-  const profilePic =
-    "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+  const [screen, setScreen] = useState("signup"); // signup → signin → loading → train
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
-  // Animation
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(20)).current;
+  // --------------- SCREEN 1 : SIGN UP ---------------
+  if (screen === "signup") {
+    return (
+      <SafeAreaView style={styles.safe}>
+        <StatusBar style="light" />
 
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, []);
+        <View style={styles.container}>
+          <Text style={styles.title}>Create Account</Text>
 
+          <TextInput
+            placeholder="Choose Username"
+            placeholderTextColor="#999"
+            style={styles.input}
+          />
+
+          <TextInput
+            placeholder="Choose Password"
+            placeholderTextColor="#999"
+            style={styles.input}
+            secureTextEntry
+          />
+
+          <TouchableOpacity
+            style={styles.btn}
+            onPress={() => setScreen("signin")}
+          >
+            <Text style={styles.btnText}>Continue</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => setScreen("signin")}>
+            <Text style={styles.link}>Already have an account? Sign In</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // --------------- SCREEN 2 : SIGN IN ---------------
+  if (screen === "signin") {
+    return (
+      <SafeAreaView style={styles.safe}>
+        <StatusBar style="light" />
+
+        <View style={styles.container}>
+          <Text style={styles.title}>Welcome Back</Text>
+
+          <TextInput
+            placeholder="Username"
+            placeholderTextColor="#999"
+            style={styles.input}
+            value={username}
+            onChangeText={setUsername}
+          />
+
+          <TextInput
+            placeholder="Password"
+            placeholderTextColor="#999"
+            style={styles.input}
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
+
+          <TouchableOpacity
+            style={styles.btn}
+            onPress={() => setScreen("loading")}
+          >
+            <Text style={styles.btnText}>Sign In</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => setScreen("signup")}>
+            <Text style={styles.link}>Don't have an account? Sign Up</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // --------------- SCREEN 3 : TRAIN LOADING ---------------
+  if (screen === "loading") {
+    useEffect(() => {
+      setTimeout(() => setScreen("train"), 2000); // 2 seconds delay
+    }, []);
+
+    return (
+      <SafeAreaView style={styles.safe}>
+        <StatusBar style="light" />
+        <View style={styles.center}>
+          <Image
+            source={{
+              uri: "https://cdn-icons-png.flaticon.com/512/71/71028.png",
+            }}
+            style={{ width: 90, height: 90, marginBottom: 20 }}
+          />
+          <ActivityIndicator size="large" color="#fff" />
+          <Text style={styles.loadingText}>Fetching Train Details...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // --------------- SCREEN 4 : TRAIN DETAILS PAGE ---------------
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar style="light" />
 
-      <View style={styles.container}>
-        <Animated.View
-          style={[
-            styles.card,
-            { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
-          ]}
+      <View style={styles.trainCard}>
+        <Text style={styles.trainTitle}>Train Availability</Text>
+
+        <View style={styles.row}>
+          <Text style={styles.label}>From</Text>
+          <Text style={styles.value}>Mysuru Junction (MYS)</Text>
+        </View>
+
+        <View style={styles.row}>
+          <Text style={styles.label}>To</Text>
+          <Text style={styles.value}>KSR Bengaluru (SBC)</Text>
+        </View>
+
+        <View style={styles.row}>
+          <Text style={styles.label}>Departure</Text>
+          <Text style={styles.value}>06:15 AM</Text>
+        </View>
+
+        <View style={styles.row}>
+          <Text style={styles.label}>Arrival</Text>
+          <Text style={styles.value}>09:00 AM</Text>
+        </View>
+
+        <View style={styles.row}>
+          <Text style={styles.label}>Fare</Text>
+          <Text style={styles.value}>₹85</Text>
+        </View>
+
+        <View style={styles.row}>
+          <Text style={styles.label}>Date</Text>
+          <Text style={styles.value}>19 Nov 2025</Text>
+        </View>
+
+        <TouchableOpacity
+          style={styles.btn}
+          onPress={() => setScreen("signin")}
         >
-          <Image source={{ uri: profilePic }} style={styles.image} />
-
-          <Text style={styles.name}>PRANAV</Text>
-
-          <View style={styles.row}>
-            <Text style={styles.label}>USN</Text>
-            <Text style={styles.value}>4NI24IS134</Text>
-          </View>
-
-          <View style={styles.row}>
-            <Text style={styles.label}>College</Text>
-            <Text style={styles.value}>
-              National Institute of Engineering, Mysuru
-            </Text>
-          </View>
-
-          <View style={styles.row}>
-            <Text style={styles.label}>Branch</Text>
-            <Text style={styles.value}>ISE</Text>
-          </View>
-
-          <View style={styles.tag}>
-            <Text style={styles.tagText}>Professional Profile</Text>
-          </View>
-        </Animated.View>
+          <Text style={styles.btnText}>Logout</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 }
 
+// --------------------- STYLES ---------------------
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
@@ -83,67 +176,80 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
   },
-
-  card: {
-    backgroundColor: "#111",
-    paddingVertical: 35,
-    paddingHorizontal: 25,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: "#333",
+  center: {
+    flex: 1,
+    justifyContent: "center",
     alignItems: "center",
   },
-
-  image: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: "#222",
-    marginBottom: 15,
+  title: {
+    color: "#fff",
+    fontSize: 30,
+    fontWeight: "800",
+    marginBottom: 25,
   },
-
-  name: {
+  input: {
+    backgroundColor: "#111",
+    borderWidth: 1,
+    borderColor: "#333",
+    color: "#fff",
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    borderRadius: 10,
+    marginBottom: 14,
+  },
+  btn: {
+    backgroundColor: "#333",
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+    marginTop: 10,
+  },
+  btnText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  link: {
+    color: "#888",
+    marginTop: 15,
+    textAlign: "center",
+    fontSize: 14,
+    textDecorationLine: "underline",
+  },
+  loadingText: {
+    color: "#ccc",
+    marginTop: 10,
+  },
+  trainCard: {
+    marginTop: 60,
+    backgroundColor: "#111",
+    padding: 25,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#333",
+    width: "88%",
+    alignSelf: "center",
+  },
+  trainTitle: {
     color: "#fff",
     fontSize: 26,
     fontWeight: "800",
-    marginBottom: 12,
-    letterSpacing: 2,
+    marginBottom: 20,
+    textAlign: "center",
   },
-
   row: {
-    width: "100%",
-    marginTop: 10,
+    marginBottom: 12,
   },
-
   label: {
-    color: "#aaa",
-    fontSize: 12,
-    fontWeight: "700",
+    color: "#888",
+    fontSize: 13,
     textTransform: "uppercase",
   },
-
   value: {
     color: "#fff",
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: "600",
-    marginTop: 3,
-  },
-
-  tag: {
-    marginTop: 18,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "#555",
-  },
-
-  tagText: {
-    color: "#ddd",
-    fontWeight: "700",
-    fontSize: 12,
-    letterSpacing: 1,
   },
 });
